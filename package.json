@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx nodemon ./src/app.js"
+    "start": "npx nodemon ./src/app.js",
+    "seed": "node ./src/seedDb.js"
   },
   "keywords": [],
   "author": "",

@@ -8,3 +8,5 @@ await mongoClient.connect();
 const db = mongoClient.db(process.env.MONGO_NAME);
 
 export default db;
+
+export { mongoClient }
