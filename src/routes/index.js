@@ -1,5 +1,9 @@
 import { Router } from 'express';
-//importar as rotas aqui
+
+import authRouter from './authRouter.js';
+
 const router = Router();
+
+router.use(authRouter);
 
 export default router;
