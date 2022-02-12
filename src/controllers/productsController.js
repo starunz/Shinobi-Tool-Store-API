@@ -37,3 +37,45 @@ export async function getProduct(req, res) {
     }
 
 }
+
+export async function addToCart(req, res) {
+
+    const { productId } = req.params;
+    const data = req.body;
+    const user = res.locals.user;
+
+    try {
+
+        const userCart = await db.collection('carts').findOne({ userId: user._id });
+
+        if (!userCart) {
+            await db.collection('carts').insertOne({
+                userId: user._id,
+                products: [{
+                    ...data,
+                    productId: productId
+                }]
+            });
+            return res.sendStatus(201)
+        }
+
+        await db.collection('carts').updateOne({ userId: user._id },
+            {
+                $set: {
+                    products: [{
+                        ...userCart.products
+                    },
+                    {
+                        ...data,
+                        productId: productId
+                    }]
+                }
+            })
+
+        res.sendStatus(201);
+
+    } catch (error) {
+        res.sendStatus(500);
+    }
+
+}
