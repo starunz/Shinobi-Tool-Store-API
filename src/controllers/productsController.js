@@ -56,6 +56,12 @@ export async function addToCart(req, res) {
                     productId: productId
                 }]
             });
+
+            await db.collection('products').updateOne({ _id: new ObjectId(productId) },
+                {
+                    $inc: { quantity: -1 }
+                })
+
             return res.sendStatus(201)
         }
 
@@ -73,6 +79,11 @@ export async function addToCart(req, res) {
                         productId: productId
                     }
                 }
+            })
+
+        await db.collection('products').updateOne({ _id: new ObjectId(productId) },
+            {
+                $inc: { quantity: -1 }
             })
 
         res.sendStatus(201);
@@ -108,6 +119,7 @@ export async function updateQty(req, res) {
     const user = res.locals.user;
     const id = req.body.id;
     const newQty = req.body.qty;
+    const qtyChange = req.body.change;
 
     try {
 
@@ -124,6 +136,11 @@ export async function updateQty(req, res) {
             { arrayFilters: [{ "elem.productId": id }] }
 
         )
+
+        await db.collection('products').updateOne({ _id: new ObjectId(id) },
+            {
+                $inc: { quantity: -qtyChange }
+            })
 
         res.sendStatus(200)
 
