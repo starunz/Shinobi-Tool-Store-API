@@ -149,3 +149,31 @@ export async function updateQty(req, res) {
     }
 
 }
+
+export async function deleteItem(req, res) {
+
+    const { productId } = req.params;
+    const user = res.locals.user;
+    const qty = req.body.quantity;
+
+    try {
+
+        const thisItem = await db.collection('carts').findOne({ userId: user._id, "products.productId": productId });
+
+        if (!thisItem) {
+            return res.sendStatus(404);
+        }
+
+        await db.collection('products').updateOne({ _id: new ObjectId(productId) },
+            { $inc: { quantity: qty } }
+        )
+
+        await db.collection('carts').deleteOne({ userId: user._id, "products.productId": productId });
+
+        res.sendStatus(200);
+    } catch (error) {
+        res.sendStatus(500)
+    }
+
+
+}
