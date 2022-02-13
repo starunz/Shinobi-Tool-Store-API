@@ -50,7 +50,7 @@ export async function addToCart(req, res) {
 
         if (!userCart) {
             await db.collection('carts').insertOne({
-                userId: user._id,
+                userId: new ObjectId(user._id),
                 products: [{
                     ...data,
                     productId: productId
@@ -59,16 +59,19 @@ export async function addToCart(req, res) {
             return res.sendStatus(201)
         }
 
+        const thisItem = await db.collection('carts').findOne({ userId: user._id, "products.productId": productId });
+
+        if (thisItem) {
+            return res.sendStatus(409);
+        }
+
         await db.collection('carts').updateOne({ userId: user._id },
             {
-                $set: {
-                    products: [{
-                        ...userCart.products
-                    },
-                    {
+                $push: {
+                    products: {
                         ...data,
                         productId: productId
-                    }]
+                    }
                 }
             })
 
@@ -76,6 +79,56 @@ export async function addToCart(req, res) {
 
     } catch (error) {
         res.sendStatus(500);
+    }
+
+}
+
+export async function getCart(req, res) {
+
+    const user = res.locals.user;
+
+    try {
+
+        const userCart = await db.collection('carts').findOne({ userId: user._id });
+
+        if (!userCart) {
+            return res.sendStatus(404)
+        }
+
+        res.send(userCart);
+
+    } catch (error) {
+        res.sendStatus(500);
+    }
+
+}
+
+export async function updateQty(req, res) {
+
+    const user = res.locals.user;
+    const id = req.body.id;
+    const newQty = req.body.qty;
+
+    try {
+
+        const userCart = await db.collection('carts').findOne({ userId: user._id });
+
+        if (!userCart) {
+            return res.sendStatus(401)
+        }
+
+        await db.collection('carts').updateOne({ userId: user._id, "products.productId": id },
+            {
+                $set: { "products.$[elem].quantity": newQty }
+            },
+            { arrayFilters: [{ "elem.productId": id }] }
+
+        )
+
+        res.sendStatus(200)
+
+    } catch (error) {
+        res.sendStatus(500)
     }
 
 }
