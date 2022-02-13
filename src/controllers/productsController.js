@@ -168,7 +168,15 @@ export async function deleteItem(req, res) {
             { $inc: { quantity: qty } }
         )
 
-        await db.collection('carts').deleteOne({ userId: user._id, "products.productId": productId });
+        await db.collection('carts').updateOne({ userId: user._id, "products.productId": productId },
+            {
+                $pull: {
+                    products: {
+                        productId: productId
+                    }
+                }
+            }
+        );
 
         res.sendStatus(200);
     } catch (error) {
