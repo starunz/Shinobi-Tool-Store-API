@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb';
 import db from '../db.js';
 
 export async function sendInfos(req, res) {
@@ -10,7 +9,7 @@ export async function sendInfos(req, res) {
 
         const userInfosObject = { ...userInfos, userId: user._id };
 
-        await db.collection('checkout').insertOne(userInfosObject);
+        await db.collection('infos').insertOne(userInfosObject);
 
         res.sendStatus(200)
 
