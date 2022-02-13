@@ -183,5 +183,4 @@ export async function deleteItem(req, res) {
         res.sendStatus(500)
     }
 
-
 }
