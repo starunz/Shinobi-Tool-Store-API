@@ -27,7 +27,6 @@ export async function checkout(req, res) {
         .collection('carts')
         .findOne({ userId: user._id });
 
-        console.log('1')
         if(!userCart)  return res.sendStatus(401)
 
         const userInfos = await db
@@ -40,11 +39,23 @@ export async function checkout(req, res) {
             userCart, 
             userInfos
         }
-
-        console.log(Order);
         res.status(200).send(Order);
     } catch (error) {
-        console.log(error)
         res.sendStatus(500)
+    }
+}
+
+export async function confirmOrder(req, res) {
+    const user = res.locals.user;
+    const InfosOrder = req.body 
+
+    try {
+        await db 
+        .collection('checkout')
+        .insertOne({...InfosOrder, userId: user._id })
+
+        res.sendStatus(201);
+    } catch (error) {
+        res.sendStatus(500);
     }
 }
