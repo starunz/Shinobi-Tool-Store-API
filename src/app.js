@@ -9,6 +9,6 @@ server.use(cors());
 
 server.use(router);
 
-server.listen(5000, () => {
-    console.log('rodando')
+server.listen(process.env.PORT, () => {
+    console.log('rodando' + process.env.PORT)
 });
